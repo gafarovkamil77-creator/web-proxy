@@ -3,16 +3,27 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 
 const app = express();
 
-// СЮДА ПИШЕМ САЙТ, КОТОРЫЙ ХОТИМ ОТКРЫВАТЬ ЧЕРЕЗ ПРОКСИ
-// Можно поменять, например на https://www.youtube.com или https://t.me
+// Сайт, который хотим открывать через прокси
 const TARGET = "https://www.google.com";
 
+// Просто проверка, что сервер жив
+app.get("/", (req, res) => {
+  res.send(
+    "<h1>Сервер работает ✅</h1>" +
+      "<p>Чтобы зайти через прокси, перейди по <a href=\"/proxy/\">/proxy/</a></p>"
+  );
+});
+
+// Всё, что по пути /proxy/ → отправляем на TARGET
 app.use(
-  "/",
+  "/proxy",
   createProxyMiddleware({
     target: TARGET,
     changeOrigin: true,
     secure: false,
+    pathRewrite: {
+      "^/proxy": "", // убираем /proxy из пути
+    },
   })
 );
 
